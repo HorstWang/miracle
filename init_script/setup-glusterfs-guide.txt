@@ -1,0 +1,11 @@
+iptables -I INPUT -p all -s `<ip-address>` -j ACCEPT
+gluster peer probe node02
+fdisk /dev/sdc
+mkfs.xfs -i size=512 /dev/sdc1
+echo "/dev/sdc1 /export/sdc1 xfs defaults 0 0"  >> /etc/fstab
+mkdir -p /export/sdc1 && mount -a && mkdir -p /export/sdc1/brick
+gluster volume create gv0 replica 2 kube-worker-1:/export/sdc1/brick kube-worker-2:/export/sdc1/brick
+gluster volume start gv0
+
+Add following to your /etc/fstab:
+localhost:/gv0 /mnt/gv0 glusterfs defaults,_netdev 0 0

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <table class="table table-striped table-bordered table-hover">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Serial number</th>
+                <th>Remote directory</th>
+                <th>Local directory</th>
+                <th>Downloaded size</th>
+                <th>Download started</th>
+                <th>Download completed</th>
+                <th>Download succeeded</th>
+                <th>Dump started</th>
+                <th>Dump completed</th>
+                <th>Dump succeeded</th>
+                <th>Error</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cdlog in cdlog_lst %}
+                <tr id="{{ cdlog.id }}_cdlog_row">
+                    <td>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                Actions
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu pull-right" role="menu">
+                                <li><a onclick="window.location.href = 'cdlog_analysis_home?cdlog_id={{ cdlog.id }}'">Analyze</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li><a onclick="download_log(true)">Redownload</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <!--div class="btn-group" role="group" aria-label="Basic example" style="display:none" id="{{ cdlog.id }}_action_group">
+                            <button id="{{ cdlog.id }}_investigate_button" type="button" class="btn btn-secondary btn-default btn-xs" onclick="window.location.href = 'cdlog_analysis_home?cdlog_id={{ cdlog.id }}'">A</button>
+                            <button id="{{ cdlog.id }}_force_redownload_button" type="button" class="btn btn-secondary btn-default btn-xs" onclick="">P</button>
+                        </div-->
+                    </td>
+                    <td id="{{ cdlog.id }}_serial_number">{{ cdlog.serial_number }}</td>
+                    <td id="{{ cdlog.id }}_remote_directory">{{ cdlog.remote_directory }}</td>
+                    <td id="{{ cdlog.id }}_local_directory">{{ cdlog.local_directory }}</td>
+                    <td id="{{ cdlog.id }}_downloaded_size"></td>
+                    <td id="{{ cdlog.id }}_download_started"></td>
+                    <td id="{{ cdlog.id }}_download_completed"></td>
+                    <td id="{{ cdlog.id }}_download_succeeded"></td>
+                    <td id="{{ cdlog.id }}_dump_started"></td>
+                    <td id="{{ cdlog.id }}_dump_completed"></td>
+                    <td id="{{ cdlog.id }}_dump_succeeded"></td>
+                    <td id="{{ cdlog.id }}_exception"></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block post_script %}
+    {% for cdlog_id in cdlog_id_lst %}
+        <script>
+            function download_log(force) {
+                $.ajax({
+                    url: "load_from_log_server?cdlog_id=" + {{ cdlog_id }} + (force ? '&force' : ''),
+                    complete: function(xhr, status) {
+                        console.log("Complete for cdlog with id " + {{ cdlog_id }} + "...");
+                        console.log(status);
+                    },
+                    success: function(data, status, xhr) {
+                        console.log(data);
+                    },
+                    error: function(xhr, status, thrown) {
+                        console.log(status);
+                        console.log(thrown);
+                    }
+                });
+            }
+            
+            download_log(false);
+        </script>
+        <script>
+            setInterval(function(){ 
+                $.ajax({
+                    url: "view_cdlog_load_state?cdlog_id=" + {{ cdlog_id }},
+                    success: function(data, status, xhr) {
+                        cdlog = data[0]
+                        cdlog_id = cdlog.id
+                        $('#' + cdlog_id + '_downloaded_size').text((cdlog.downloaded_size / 1024 / 1024) + ' MB');
+                        if(cdlog.download_started) {
+                            $('#' + cdlog_id + '_download_started').attr('class', 'success');
+                        } else {
+                            $('#' + cdlog_id + '_download_started').attr('class', 'danger');
+                        }
+                        $('#' + cdlog_id + '_download_started').text(cdlog.download_started);
+                        if(cdlog.download_completed) {
+                            $('#' + cdlog_id + '_download_completed').attr('class', 'success');
+                        } else {
+                            $('#' + cdlog_id + '_download_completed').attr('class', 'danger');
+                        }
+                        $('#' + cdlog_id + '_download_completed').text(cdlog.download_completed);
+                        if(cdlog.download_succeeded) {
+                            $('#' + cdlog_id + '_download_succeeded').attr('class', 'success');
+                        } else {
+                            $('#' + cdlog_id + '_download_succeeded').attr('class', 'danger');
+                        }
+                        $('#' + cdlog_id + '_download_succeeded').text(cdlog.download_succeeded);
+                        if(cdlog.dump_started) {
+                            $('#' + cdlog_id + '_dump_started').attr('class', 'success');
+                        } else {
+                            $('#' + cdlog_id + '_dump_started').attr('class', 'danger');
+                        }
+                        $('#' + cdlog_id + '_dump_started').text(cdlog.dump_started);
+                        if(cdlog.dump_completed) {
+                            $('#' + cdlog_id + '_dump_completed').attr('class', 'success');
+                            $('#' + cdlog_id + '_action_group').show();
+                        } else {
+                            $('#' + cdlog_id + '_dump_completed').attr('class', 'danger');
+                        }
+                        $('#' + cdlog_id + '_dump_completed').text(cdlog.dump_completed);
+                        if(cdlog.dump_succeeded) {
+                            $('#' + cdlog_id + '_dump_succeeded').attr('class', 'success');
+                        } else {
+                            $('#' + cdlog_id + '_dump_succeeded').attr('class', 'danger');
+                        }
+                        $('#' + cdlog_id + '_dump_succeeded').text(cdlog.dump_succeeded);
+                        $('#' + cdlog_id + '_exception').text(cdlog.exception);
+                    },
+                    error: function(xhr, status, thrown) {
+                        console.log(status);
+                        console.log(thrown);
+                    }
+                });
+            }, 3000);
+        </script>
+    {% endfor %}
+{% endblock %}

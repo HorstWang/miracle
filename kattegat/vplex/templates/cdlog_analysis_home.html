@@ -1,0 +1,677 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <!--
+    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ search_form }}
+            {{ form.errors }}
+            {{ form.non_field_errors }}
+            </br>
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+    -->
+    
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <ul class="nav nav-tabs">
+            {% for cluster, cluster_info in cluster_hierachy.items %}
+                <li
+                    {% if forloop.first %}
+                        class="active"
+                    {% endif %}
+                ><a href="#{{ cluster_info.serial_number }}_cluster_panel" data-toggle="tab" aria-expanded="true">{{ cluster }} {{ cluster_info.serial_number }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+                {% for cluster, cluster_info in cluster_hierachy.items %}
+                    <div class="tab-pane fade 
+                        {% if forloop.first %}
+                            active
+                        {% endif %}
+                    in" id="{{ cluster_info.serial_number }}_cluster_panel">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" style="display:none">
+                                <i class="fa fa-list-alt fa-fw"></i> {{ cluster }} {{ cluster_info.serial_number }}
+                                <div class="pull-right">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                            Actions
+                                            <span class="caret"></span>
+                                        </button>
+                                        <ul class="dropdown-menu pull-right" role="menu">
+                                            <li><a href="#">Action</a>
+                                            </li>
+                                            <li><a href="#">Another action</a>
+                                            </li>
+                                            <li><a href="#">Something else here</a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            <li><a href="#">Separated link</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /.panel-heading -->
+                            <div class="panel-body">
+                                <!-- form>
+                                    <input type="hidden" name="cdlog_id" value="{{ cdlog_id }}" />
+                                    <div class="form-group">
+                                        <label for="component-select">Component Type</label>
+                                        <select id="component-select" class="form-control">
+                                            <option>Storage view</option>
+                                            <option>Initiator</option>
+                                            <option>VPlex port</option>
+                                            <option>Storage array</option>
+                                            <option>Virtual volume</option>
+                                            <option>Storage volume  </option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="component-select">Key</label>
+                                        <input type="text" class="form-control">
+                                        </br>
+                                        <button class="form-control btn btn-primary" type="submit"><i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </form -->
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a href="#{{ cluster_info.serial_number }}_cluster" data-toggle="tab" aria-expanded="true">Cluster</a>
+                                    </li>
+                                    <li class=""><a href="#{{ cluster_info.serial_number }}_storage_view" data-toggle="tab" aria-expanded="false">Storage views</a>
+                                    </li>
+                                    <li><a href="#{{ cluster_info.serial_number }}_array" data-toggle="tab">Arrays</a>
+                                    </li>
+                                    <li><a href="#{{ cluster_info.serial_number }}_firmwarelog" data-toggle="tab">Firmware log</a>
+                                    </li>
+                                    <li><a href="#{{ cluster_info.serial_number }}_performance" data-toggle="tab">Performance</a>
+                                    </li>
+                                    <li><a href="#{{ cluster_info.serial_number }}_performance_vv" data-toggle="tab">Virtual volume performance</a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content">
+                                    <div class="tab-pane fade active in" id="{{ cluster_info.serial_number }}_cluster">
+                                        <h4>Cluster architecture</h4>
+                                        <p></p>
+                                        {% for engine, engine_info in cluster_info.engines.items %}
+                                            <div class="engine" id="{{ cluster_info.serial_number }}_{{ engine }}" title="{{ engine }}">
+                                                {% for director, director_info in engine_info.directors.items %}
+                                                    <div class="director_{{ director_info.director_side }}" id="director_{{ director_info.id }}" title="{{ director }}1&#013;{{ director_info.ports }}">
+                                                        <button class="btn mgt_module" id="director_{{ director_info.id }}_mgt_module" title="{{ director }} management module" data-toggle="modal" data-target="#{{ cluster_info.serial_number }}_detail_modal">
+                                                            
+                                                        </button>
+                                                        <button class="btn io_module_0" id="director_{{ director_info.id }}_io_module_0" title="{{ director }} io module 0"  data-toggle="modal" data-target="#{{ cluster_info.serial_number }}_detail_modal">
+                                                            
+                                                        </button>
+                                                        <button class="btn io_module_1" id="director_{{ director_info.id }}_io_module_1" title="{{ director }} io module 1"  data-toggle="modal" data-target="#{{ cluster_info.serial_number }}_detail_modal">
+                                                            
+                                                        </button>
+                                                        <button class="btn io_module_2" id="director_{{ director_info.id }}_io_module_2" title="{{ director }} io module 2"  data-toggle="modal" data-target="#{{ cluster_info.serial_number }}_detail_modal">
+                                                            
+                                                        </button>
+                                                        <button class="btn io_module_3" id="director_{{ director_info.id }}_io_module_3" title="{{ director }} io module 3"  data-toggle="modal" data-target="#{{ cluster_info.serial_number }}_detail_modal">
+                                                            
+                                                        </button>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% endfor %}
+                                        <div id="{{ cluster_info.serial_number }}_detail_modal" class="modal fade" role="dialog">
+                                          <div class="modal-dialog">
+
+                                            <!-- Modal content-->
+                                            <div class="modal-content">
+                                              <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 id="detail-title" class="modal-title"></h4>
+                                              </div>
+                                              <div class="modal-body">
+                                                <p id="detail_text"></p>
+                                              </div>
+                                              <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="{{ cluster_info.serial_number }}_storage_view">
+                                        <h4>Initiator to port login connectivity</h4>
+                                        <p>Query and search initiator to port login connectivity here, type in any name or wwpn for initiator and port or name of your storage view to see data you interested.</p>
+                                        <div id="storage_view_tree"></div>
+                                        <table class="table table-striped table-bordered table-hover table-responsive basic_configuration_table" id="vs_t_{{ cluster_info.serial_number }}_{{ cluster }}" cluster_serial="{{ cluster_info.serial_number }}">
+                                            <thead>
+                                                <th>Storage View</th>
+                                                <th>Initiator</th>
+                                                <th>Initiator WWNN</th>
+                                                <th>Initiator WWPN</th>
+                                                <th>Director</th>
+                                                <th>Port</th>
+                                                <th>Port Address</th>
+                                                <th>Port Status</th>
+                                            </thead>
+                                            <tbody>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="tab-pane fade" id="{{ cluster_info.serial_number }}_array">
+                                        <h4>Messages Tab</h4>
+                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                        <div class="row">
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                <table class="table table-striped table-bordered table-hover table-responsive basic_configuration_table" id="arr_t_{{ cluster_info.serial_number }}_{{ cluster }}" cluster_serial="{{ cluster_info.serial_number }}">
+                                                    <thead>
+                                                        <th>Vendor</th>
+                                                        <th>Array</th>
+                                                        <th>Revision</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                <table class="table table-striped table-bordered table-hover table-responsive basic_configuration_table" id="arr_c_{{ cluster_info.serial_number }}_{{ cluster }}" cluster_serial="{{ cluster_info.serial_number }}">
+                                                    <thead>
+                                                        <th>Array</th>
+                                                        <th>Target</th>
+                                                        <th>Backend port</th>
+                                                        <th>Backend port address</th>
+                                                        <th>Director</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="{{ cluster_info.serial_number }}_firmwarelog">
+                                        <h4>Messages Tab</h4>
+                                        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                                        <div class="row">
+                                            <div class="col-xs-12 col-sm-12 col-md-4 col-lg-3">
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="{{ cluster_info.serial_number }}_performance">
+                                        <div class="panel panel-default">
+                                            <div class="panel-heading">
+                                                <button type="button" class="btn btn-success btn-circel btn-xl" data-toggle="modal" onclick="reset_perf_param()" data-target="#chart_arg_modal"><i class="fa fa-folder-open-o"></i></button>
+                                            </div>
+                                            <!-- /.panel-heading -->
+                                            <div class="panel-body" id="raw_perf_body">
+                                                <div class="row" id="perf_c">
+                                                    
+                                                </div>
+                                            </div>
+                                            <!-- /.panel-body -->
+                                        </div>
+                                        <div id="chart_arg_modal" class="modal fade" role="dialog">
+                                          <div class="modal-dialog">
+
+                                            <!-- Modal content-->
+                                            <div class="modal-content">
+                                              <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 id="" class="modal-title">Configure new performance chart parameters</h4>
+                                              </div>
+                                              <div class="modal-body">
+                                                <p id=""></p>
+                                                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                    <form role="form">
+                                                        <div class="row">
+                                                            {% csrf_token %}
+                                                            <label for="id_chart_name_input">Chart name:</label>
+                                                            <input type="text" class="form-control" id="id_chart_name_input"></input>
+                                                            {{ date_span_picker_form }}
+                                                            {{ form.errors }}
+                                                            {{ form.non_field_errors }}
+                                                            </br>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="form-group col-xs-6 col-sm-6 col-md-6 col-lg-6" id="perf_param_director">
+                                                                <label>Directors</label>
+                                                                
+                                                            </div>
+                                                            <div class="form-group col-xs-6 col-sm-6 col-md-6 col-lg-6" id="perf_param_merge_action">
+                                                                <label>Merge action</label>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+                                                                <div class="form-group">
+                                                                    <label>Column</label>
+                                                                    <div id="perf_param_column">
+                                                                        
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                              </div>
+                                              <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal" onclick="add_raw_sys_perf_chart()">Add</button>
+                                              </div>
+                                            </div>
+                                          </div>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane fade" id="{{ cluster_info.serial_number }}_performance_vv">
+                                        <div class="panel panel-default">
+                                            <!-- /.panel-heading -->
+                                            <div class="panel-body" id="raw_perf_body">
+                                                <form>
+                                                    <label>Virtual volume</label>
+                                                    <select id="vv_select">
+                                                        
+                                                    </select>
+                                                    <label>Duration</label>
+                                                    <input id="duration-picker" type="text" name="duration-picker"></input>
+                                                    <!--https://github.com/Tartarus762/jquery-duration-picker-->
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block post_script %}
+<script>
+    function desc_table(table_name, success) {
+        $.ajax({
+            url: 'desc_table?table=' + table_name,
+            success: success
+        });
+    }
+    
+    function get_checked_director_ids() {
+        var checked_director_ids = [];
+        $('input[id^=perf_param_director]').each(function(index, input) {
+            if(input.checked) {
+                checked_director_ids.push($("#" + input.id).attr("director_id"));
+            }
+        });
+        
+        return checked_director_ids;
+    }
+    
+    function get_checked_perf_columns() {
+        var checked_perf_columns = []
+        $('input[id^=perf_param_column]').each(function(index, input) {
+            if(input.checked) {
+                checked_perf_columns.push($("#" + input.id).attr("value"));
+            }
+        });
+        
+        return checked_perf_columns;
+    }
+    
+    function get_checked_merge_action() {
+        var checked_merge_action = null;
+        $('input[id^=merge_action]').each(function(index, input) {
+            if(input.checked) {
+                checked_merge_action = $("#" + input.id).attr("value");
+            }
+        });
+        
+        return checked_merge_action;
+    }
+
+    function init_perf_param_modal(cdlog_id) {
+        console.log("Init perf param modal for " + cdlog_id);
+        $.ajax({
+            url: 'api_sys_perf_log_available_director?cdlog_id=' + cdlog_id,
+            success: function(data, status, xhr) {
+                data.rows.forEach(function(row) {
+                    cluster = row[1];
+                    director_id = row[2];
+                    director_name = row[3];
+                    text = cluster + ' ' + director_name;
+                    selector_html = '<div class="checkbox"><label><input type="checkbox" name="perf_param_director" id="perf_param_director_' + director_id + '" director_id="' + director_id + '" director_name="' + director_name + '">' + text + '</label></div>';
+                //  console.log(director_id + ' - ' + text);
+                //  console.log(selector_html);
+                    $(selector_html).appendTo("#perf_param_director");
+                });
+
+                $('input[id^=perf_param_director]').on("click", function(event) {
+                //  console.log(event.target.id + ' ' + event.target.checked);
+                    $("#" + event.target.id).prop("checked", event.target.checked);
+                    
+                    console.log(get_checked_director_ids());
+                    
+                    update_perf_param_column($("#" + event.target.id).attr("director_id"), $("#" + event.target.id).attr("director_name"), event.target.checked);
+                    
+                });
+                
+                $('input[id^=merge_action]').on("click", function(event) {
+                // console.log(event.target.id + ' ' + event.target.checked);
+                   $("#" + event.target.id).prop("checked", event.target.checked);
+                   
+                   console.log(get_checked_merge_action());
+                });
+            }
+        });
+        
+        supported_merge_actions = ['dir_sum', 'dir_avg'];
+        supported_merge_actions.forEach(function(action) {
+            action_html = '<div class="radio"><label><input type="radio" name="merge_action" id="merge_action_' + action + '" value="' + action +'">' + action + '</label></div>';
+            $(action_html).appendTo('#perf_param_merge_action');
+        });
+        
+    }
+    
+    function init_vv_perf_param(cdlog_id) {
+        $.ajax({
+            url: 'api_sys_perf_log_available_director?cdlog_id=' + cdlog_id,
+            success: function(data, status, xhr) {
+                director_id = data.rows[0][2];
+                console.log(director_id);
+                $.ajax({
+                    url: 'api_vv_perf_log_available_volumes?director_id=' + director_id,
+                    success: function(data, status, xhr) {
+                        console.log(data);
+                        data.forEach(function(vv) {
+                            vv_option = '<option value=\"' + vv + '\">' + vv + '</option>';
+                            console.log(vv_option);
+                            $(vv_option).appendTo('#vv_select');
+                        });
+                    }
+                });
+            }
+        });
+    }
+    
+    function update_perf_param_column(director_id, director_name, checked) {
+        //$("#perf_param_column").empty();
+        $.ajax({
+            url: 'api_sys_perf_log_columns?director_id=' + director_id,
+            success: function(data, status, xhr) {
+                var index = 0;
+                data.forEach(function(column) {
+                    console.log(index + ' ' + column);
+                    current_select_id = 'perf_param_column_' + director_id + '_' + index;
+                    if(checked && document.getElementById(current_select_id) == null) {
+                        selector_html = '<div class="checkbox"><label><input type="checkbox" name="perf_param_column" id="' + current_select_id + '" value="' + director_id + '_' + column + '">' + director_name + ' ' + column + '</label></div>';
+                        $(selector_html).appendTo("#perf_param_column");
+                    } else {
+                        $("#" + current_select_id).parent().remove();
+                    }
+                    index++;
+                });
+                
+                $('input[id^=perf_param_column]').on("click", function(event) {
+                    var checked = null;
+                    $("#" + event.target.id).prop("checked", event.target.checked);
+                    
+                    console.log(get_checked_perf_columns());
+                });
+            }
+        });
+    }
+
+    function reset_perf_param() {
+        $("#perf_param_column").empty();
+        $("[id^=perf_param_]").prop('checked', false);
+        $("[id^=merge_action_]").prop('checked', false);
+    }
+    
+    function add_raw_sys_perf_chart() {
+        var random_guid = guid();
+        var html_div_row = '<div class="row" id="' + random_guid + '"></div>';
+        $(html_div_row).appendTo('#raw_perf_body');
+//      get_checked_director_ids().forEach(function(director_id) {
+            var performance_chart_name = "";
+            var column_param_str = "";
+            var merge_action_str = "";
+            var datetime_span_str = "";
+            performance_chart_name = $('#id_chart_name_input').val();
+            get_checked_perf_columns().forEach(function(column) {
+                column_param_str += "&column=" + column;
+            });
+            merge_action_str = get_checked_merge_action() ? "&merge_action=" + get_checked_merge_action() : "";
+            var start_date_time_local = new Date($('#id_start_date_time').val());
+            var start_date_time = start_date_time_local.getTime() - start_date_time_local.getTimezoneOffset() * 60000;
+            var end_date_time_local = new Date($('#id_end_date_time').val());
+            var end_date_time = end_date_time_local.getTime() - end_date_time_local.getTimezoneOffset() * 60000;
+            
+            if(performance_chart_name == null || performance_chart_name == "") {
+                alert('Must specify chart name...');
+                return;
+            }
+            
+            //alert($('#id_start_date_time').val() + ' ' + start_date_time);
+            //alert($('#id_end_date_time').val() + ' ' + end_date_time);
+            datetime_span_str = "&start_date_time=" + start_date_time + "&end_date_time=" + end_date_time + "&perf_type=sys";
+            urlstr = 'api_sys_perf_log_by_columns?' + column_param_str + merge_action_str + datetime_span_str;
+            console.log(urlstr);
+            $.ajax({
+                url: urlstr,
+                success: function(data, status, xhr) {
+                    console.log(data);
+                    add_zoomable_chart(random_guid, performance_chart_name, data);
+
+                    /*
+                    Highcharts.chart('perf_c', {
+                        chart: {
+                            type: 'spline',
+                            zoomType: 'x'
+                        },
+                        title: {
+                            text: 'USD to EUR exchange rate over time'
+                        },
+                        subtitle: {
+                            text: document.ontouchstart === undefined ?
+                                    'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+                        },
+                        xAxis: {
+                            type: 'datetime'
+                        },
+                        yAxis: {
+                            title: {
+                                text: 'Exchange rate'
+                            }
+                        },
+                        legend: {
+                            enabled: true
+                        },
+                        
+                        tooltip: {
+                            headerFormat: '<b>{series.name}</b><br>',
+                            pointFormat: '{point.x:%e. %b}: {point.y:.2f} m'
+                        },
+                        
+                        plotOptions: {
+                            area: {
+                                fillColor: {
+                                    linearGradient: {
+                                        x1: 0,
+                                        y1: 0,
+                                        x2: 0,
+                                        y2: 1
+                                    },
+                                    stops: [
+                                        [0, Highcharts.getOptions().colors[0]],
+                                        [1, Highcharts.Color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                                    ]
+                                },
+                                marker: {
+                                    radius: 2
+                                },
+                                lineWidth: 1,
+                                states: {
+                                    hover: {
+                                        lineWidth: 1
+                                    }
+                                },
+                                threshold: null
+                            }
+                        },
+
+                        series: data
+                    });
+                    */
+                    
+                }
+            });
+//      });
+    }
+
+    $(document).ready(function() {
+//      var sv_t = $('#vs_t').DataTable();
+//      console.log(sv_t);
+        $.ajax({
+            url: 'api_cluster_storage_view_initiator_target_login?cdlog_id={{ cdlog_id }}',
+            success: function(data, textStatus, jqXHR) {
+                for(table_id in table_dic) {
+                    var id = table_id;
+                    if(id.startsWith("vs_t_")) {
+                        var table_obj = table_dic[table_id];
+                        var cluster_serial = $('#' + table_id).attr("cluster_serial");
+                        
+                        data.rows.forEach(function(row) {
+                            if(row[17] == cluster_serial) {
+                                table_obj.row.add([row[5], row[1], row[2], row[3], row[12], row[8], row[9], row[10]]);
+                            }
+                            table_obj.draw();
+                        });
+                    }
+                }
+            },
+            error: function(jqXHR, status, errorThrown) {
+                console.error(jqXHR);
+                console.error(status);
+                console.error(errorThrown);
+            }
+        });
+        
+        $.ajax({
+            url: 'api_cluster_array?cdlog_id={{ cdlog_id }}',
+            success: function(data, status, xhr) {
+                for(table_id in table_dic) {
+                    var id = table_id;
+                    if(id.startsWith("arr_t_")) {
+                        var table_obj = table_dic[table_id];
+                        var cluster_serial = $('#' + table_id).attr("cluster_serial");
+                        
+                        data.rows.forEach(function(row) {
+                            if(row[2] == cluster_serial) {
+                                table_obj.row.add([row[5], row[4], row[6]]);
+                            }
+                            table_obj.draw();
+                        });
+                    }
+                }
+            }
+        });
+        
+        $.ajax({
+            url: 'api_cluster_array_connectivity?cdlog_id={{ cdlog_id }}',
+            success: function(data, textStatus, jqXHR) {
+                for(table_id in table_dic) {
+                    var id = table_id;
+                    if(id.startsWith("arr_c_")) {
+                        var table_obj = table_dic[table_id];
+                        var cluster_serial = $('#' + table_id).attr("cluster_serial");
+                        
+                        data.rows.forEach(function(row) {
+                            if(row[2] == cluster_serial) {
+                                table_obj.row.add([row[10], row[8], row[6], row[7], row[4]]);
+                            }
+                            table_obj.draw();
+                        });
+                    }
+                }
+            },
+            error: function(jqXHR, status, errorThrown) {
+                console.error(jqXHR);
+                console.error(status);
+                console.error(errorThrown);
+            }
+        });
+
+        var menu = new BootstrapMenu('.basic_configuration_table tbody tr td', {
+          /* a function to know which row was the context menu opened on,
+           * given the selected DOM element. When this function is defined,
+           * every user-defined action callback receives its return value as
+           * an argument. */
+          fetchElementData: function(cell) {
+            return cell;
+          },
+          actions: [{
+            name: 'Filter by this cell',
+            onClick: function(cell) {
+              console.log(cell.text());
+              console.log(cell.parent().parent().parent().parent().parent().parent());
+              console.log(cell.parent().parent().parent().parent().parent().parent().find('[type="search"]'));
+              var search_input = cell.parent().parent().parent().parent().parent().parent().find('[type="search"]');
+              var table_id = cell.parent().parent().parent().attr('id');
+              var table = table_dic[table_id];
+              search_input.val(cell.text());
+              table.search(search_input.val()).draw();
+            }
+          }, {
+            name: 'Filter in result',
+            onClick: function(cell) {
+              console.log(cell.text());
+              console.log(cell.parent().parent().parent().parent().parent().parent());
+              console.log(cell.parent().parent().parent().parent().parent().parent().find('[type="search"]'));
+              var search_input = cell.parent().parent().parent().parent().parent().parent().find('[type="search"]');
+              var table_id = cell.parent().parent().parent().attr('id');
+              var table = table_dic[table_id];
+              var current_search_text = search_input.val();
+              search_input.val(current_search_text + ' ' + cell.text());
+              table.search(search_input.val()).draw();
+            }
+          }, {
+            name: 'Search in firmware log',
+            onClick: function(cell) {
+              console.log(cell.text());
+              console.log(cell.parent().parent().parent().parent().parent().parent());
+              console.log(cell.parent().parent().parent().parent().parent().parent().find('[type="search"]'));
+            }
+          }]
+        });
+        
+        init_perf_param_modal({{ cdlog_id }});
+        init_vv_perf_param({{ cdlog_id }});
+        
+        //Duration picker
+        $('#duration-picker').durationPicker({
+            days: {
+                label: 'days',
+                min: 0,
+                },
+            hours: {
+                label: 'hours',
+                min: 0,
+                max: 23
+                },
+            minutes: {
+                label: 'minutes',
+                min: 0,
+                max: 59
+                },
+            type: 'number',
+            responsive: true
+        });
+    });
+</script>
+{% endblock %}

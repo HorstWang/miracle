@@ -1,0 +1,6 @@
+# https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: sidecar
+  namespace: development

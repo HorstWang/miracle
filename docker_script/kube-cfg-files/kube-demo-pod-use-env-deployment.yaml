@@ -1,0 +1,82 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: vplex-log-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: vplex_log_deployment
+    spec:
+      containers:
+      - name: db
+        image: activemauney/vplex_log_db:32
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - name: mysql-data
+          mountPath: "/var/lib/mysql"
+        - name: mysqld-sock
+          mountPath: "/var/run/mysqld/"
+        resources:
+          limits:
+            memory: "200Mi"
+          requests:
+            memory: "100Mi"
+      - name: web
+        image: activemauney/vplex_log_parser:32
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - name: mysqld-sock
+          mountPath: "/var/run/mysqld/"
+        - name: log-download
+          mountPath: "/log_download/"
+        env:
+        - name: DB_CONTAINER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: log-pod-env
+              key: DB_CONTAINER_NAME
+        - name: WEB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: log-pod-env
+              key: WEB_PORT
+        resources:
+          limits:
+            memory: "200Mi"
+          requests:
+            memory: "100Mi"
+      - name: log-server
+        image: activemauney/vplex_log_server:32
+        volumeMounts:
+        - name: mysqld-sock
+          mountPath: "/var/run/mysqld/"
+        - name: log-download
+          mountPath: "/log_download/"
+        env:
+        - name: DB_CONTAINER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: log-pod-env
+              key: DB_CONTAINER_NAME
+        resources:
+          limits:
+            memory: "400Mi"
+          requests:
+            memory: "200Mi"
+      hostNetwork: true
+      volumes:
+      - name: mysql-data
+        hostPath:
+          path: "/var/kube-share/demo-1/mysql-data"
+      - name: mysqld-sock
+        hostPath:
+          path: "/var/kube-share/demo-1/mysqld-sock"
+      - name: log-download
+        hostPath:
+          path: "/var/kube-share/demo-1/log-download"
+      nodeSelector:
+        region: dev

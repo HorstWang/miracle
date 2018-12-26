@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <p>Extraction job ID {{ extraction_job_id }}</p>
+            </div>
+            <div class="panel-body">
+                <table class="table table-striped table-bordered table-hover table-responsive basic_configuration_table" id="extraction_job_table">
+                    <thead>
+                        <tr>
+                            <th>Log file</th>
+                            <th>Extracted to</th>
+                            <th>State</th>
+                            <th>Return code</th>
+                            <th>Exception</th>
+                            <th>Agent</th>
+                            <th>Last updated</th>
+                        </tr>
+                    </thead>
+                    <tbody id="extraction_job_rows">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block post_script %}
+<script>
+    setInterval(function() {
+        $.ajax({
+            url: 'api_cdlog_extraction_job?extraction_job_id=' + {{ extraction_job_id }},
+            success: function(data, status, xhr) {
+                table_dic['extraction_job_table'].clear().draw();
+                data.rows.forEach(function(row) {
+                    var log_file = row[1];
+                    var extraction_dir = row[2];
+                    var state = row[3];
+                    var cdlog_id = row[4];
+                    var returncode = row[6];
+                    var exception = row[5];
+                    var agent = row[7];
+                    
+                    table_dic['extraction_job_table'].row.add([log_file, extraction_dir, state, returncode, exception, agent, new Date()]).draw();
+                    
+                    if(state == 'COMPLETED_SUCCEEDED') {
+                        window.location.href = "dump_cdlog_to_database?cdlog_id=" + cdlog_id;
+                    }
+                });
+            }
+        });
+    }, 3000);
+</script>
+{% endblock %}

@@ -1,0 +1,28 @@
+#/bin/bash
+
+KUBE_VER=$1
+ORIGINAL_REPO=k8s.gcr.io
+PRIVATE_REPO=activemauney
+
+if [ "$KUBE_VER" = "" ]
+then
+  echo "Must define kubernetes version!"
+  exit
+fi
+
+for img in $(cat ./kube-img-list-$KUBE_VER )
+do
+  private_image=$(echo $img | sed -r 's/'$ORIGINAL_REPO'/'$PRIVATE_REPO'/')
+  echo 'Pulling '$private_image' ...'
+  sudo docker pull $private_image
+  private_image_info_arr=$(echo $private_image | sed -r 's/:/ /')
+  private_image_name=$(echo $private_image_info_arr | awk '{ print $1 }')
+  private_image_tag=$(echo $private_image_info_arr | awk '{ print $2 }')
+  img_id=$(sudo docker images -a | grep $private_image_name | grep $private_image_tag | awk '{ print $3 }')
+  echo 'Name:'$private_image_name
+  echo 'Tag:'$private_image_tag
+  echo 'ID:'$img_id
+  original_image=$(echo $private_image | sed -r 's/'$PRIVATE_REPO'/'$ORIGINAL_REPO'/')
+  echo 'Tagging image '$img_id' as '$original_image
+  sudo docker tag $img_id $original_image
+done

@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-replica-set
+  labels:
+    app: mongo-rs
+spec:
+  clusterIP: None
+  ports:
+  - port: 27017
+    targetPort: 27017
+    name: mongo-port
+  selector:
+    app: mongod
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo-rs
+spec:
+  serviceName: "mongo-rs"
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mongod
+  template:
+    metadata:
+      labels:
+        app: mongod
+    spec:
+      hostNetwork: true
+      containers:
+      - name: mongod
+        image: activemauney/mongod:0.01
+        ports:
+        - containerPort: 27017
+          name: mongo-port
+        volumeMounts:
+        - name: mongo-rs-config
+          mountPath: /my/custom/
+        - name: mongo-rs-log
+          mountPath: /var/log/mongodb/
+        - name: mongo-rs-data
+          mountPath: /var/lib/mongodb/
+      volumes:
+      - name: mongo-rs-config
+        hostPath:
+          path: /mnt/gv-config/statefulset-mongo-rs/
+      - name: mongo-rs-log
+        hostPath:
+          path: /mnt/lv_db_data/mongo-rs/log/
+      - name: mongo-rs-data
+        hostPath:
+          path: /mnt/lv_db_data/mongo-rs/data/

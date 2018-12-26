@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <p>CDLog ID {{ cdlog_id }}</p>
+            </div>
+            <div class="panel-body">
+                <table class="table table-striped table-bordered table-hover table-responsive basic_configuration_table" id="dump_cdlog_table">
+                    <thead>
+                        <tr>
+                            <th>Extracted log path</th>
+                            <th>Product type</th>
+                            <th>Serial number</th>
+                            <th>Code level</th>
+                            <th>Dump started</th>
+                            <th>Dump completed</th>
+                            <th>Dump succeeded</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dump_job_rows">
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block post_script %}
+<script>
+    $.ajax({
+        url: 'api_dump_cdlog_to_database?cdlog_id=' + {{ cdlog_id }},
+        error: function() {
+            alert('Failed to dump cdlog with id ' + {{ cdlog_id }} + ' to database!');
+        }
+    });
+
+    setInterval(function() {
+        $.ajax({
+            url: 'api_monitor_dump_cdlog_to_database?cdlog_id=' + {{ cdlog_id }},
+            success: function(data, status, xhr) {
+                var t = table_dic['dump_cdlog_table'];
+                t.clear().draw();
+                data.rows.forEach(function(row) {
+                    var cdlog_id = row[0];
+                    var extracted_log_path = row[3];
+                    var product_type = row[9];
+                    var serial_number = row[10];
+                    var code_level = row[8];
+                    var dump_started = row[5];
+                    var dump_completed = row[7];
+                    var dump_succeeded = row[6];
+                    
+                    t.row.add([ extracted_log_path, product_type, serial_number, code_level, dump_started, dump_completed, dump_succeeded ]).draw();
+                    console.log(cdlog_id);
+                    
+                    if(dump_succeeded == 1) {
+                        window.location.href = 'cdlog_analysis_home?cdlog_id=' + {{ cdlog_id }};
+                    }
+                });
+            }
+        });
+    }, 3000);
+</script>
+{% endblock %}

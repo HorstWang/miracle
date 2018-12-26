@@ -1,0 +1,26 @@
+#/bin/bash
+
+VER=$(lsb_release -a 2>/dev/null | grep release: -i | awk '{ print $2 }')
+TARGET=$1
+if [ "$VER" = "18.04" ]
+then
+  echo "$VER is supported"
+else
+  echo "$VER is not supported"
+  exit
+fi
+
+if [ "$USER" = "root" ]
+then
+  if [ -e "$TARGET" ]
+  then
+    echo "$TARGET exists..."
+    
+  else
+    echo "Target disk [$TARGET] cannot be found!"
+    exit
+  fi
+else
+  echo "Must be running under root permission!"
+  exit
+fi

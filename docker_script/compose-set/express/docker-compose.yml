@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  vplex_log_db_8080:
+    image: 'activemauney/vplex_log_db:0060'
+    networks:
+      - vplex_log_parser_network
+    volumes:
+      - /log_download/mysql:/var/lib/mysql
+  vplex_log_parser_8080:
+    image: 'activemauney/vplex_log_parser:0060'
+    volumes:
+      - /log_download:/log_download
+    links:
+      - vplex_log_db_8080:vplex_log_db_8080
+    ports:
+      - "8080:8080"
+    environment:
+      - DB_CONTAINER_NAME=vplex_log_db_8080
+      - WEB_PORT=8080
+    depends_on:
+      - vplex_log_db_8080
+    networks:
+      - vplex_log_parser_network
+  vplex_log_server:
+    image: 'activemauney/vplex_log_server:0060'
+    volumes:
+      - /log_download:/log_download
+    links:
+      - vplex_log_db_8080:vplex_log_db_8080
+    environment:
+      - DB_CONTAINER_NAME=vplex_log_db_8080
+    depends_on:
+      - vplex_log_db_8080
+    networks:
+      - vplex_log_parser_network
+
+networks:
+  vplex_log_parser_network:
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
+  vplex_log_db_network:
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24

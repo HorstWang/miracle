@@ -1,0 +1,7 @@
+Command for building this image
+sudo docker build -t docker-env .
+
+Command for running this image with binding docker.sock at the host
+sudo docker run -u root -v /var/run/docker.sock:/var/run/docker.sock -v "$HOME":/home -d docker-env
+
+Binding docker.sock on the host, so that you can communicate with docker deamon on host server

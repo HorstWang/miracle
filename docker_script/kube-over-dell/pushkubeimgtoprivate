@@ -1,0 +1,25 @@
+#/bin/bash
+
+KUBE_VER=$1
+ORIGINAL_REPO=k8s.gcr.io
+PRIVATE_REPO=activemauney
+PRIVATE_PASSWORD='DF31AntiUS@'
+
+if [ $KUBE_VER = "" ]
+then
+  echo "Must define kubernetes version..."
+  exit
+fi
+
+echo 'Login into private repositor '$PRIVATE_REPO' ...'
+sudo docker login -u $PRIVATE_REPO -p $PRIVATE_PASSWORD
+for id in $(sudo docker images -a | grep $ORIGINAL_REPO | grep $KUBE_VER | awk '{ print $3 }')
+do
+  image_name=$(sudo docker images -a | grep $id | awk '{ print $1 }')
+  tag=$(sudo docker images -a | grep $id | awk '{ print $2 }')
+  private_image_name=$(echo $image_name | sed -r 's/k8s.gcr.io/'$PRIVATE_REPO'/')
+  echo 'Tag '$image_name':'$tag' as '$private_image_name':'$tag
+  sudo docker tag $id $private_image_name':'$tag
+  echo 'Pushing '$private_image_name':'.$tag
+  sudo docker push $private_image_name':'$tag
+done

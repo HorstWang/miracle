@@ -1,0 +1,75 @@
+.engine {
+    width: 400px;
+    height: 150px;
+    background: orange;
+    border: 3px solid #999;
+}
+
+.director_a {
+    width: 180px;
+    height: 120px;
+    background: green;
+    border: 3px solid #999;
+    position: relative;
+    left: 15px;
+    top: 12px;
+}
+
+.director_b {
+    width: 180px;
+    height: 120px;
+    background: green;
+    border: 3px solid #999;
+    position: relative;
+    left: 200px;
+    top: -108px;
+}
+
+.mgt_module {
+    width: 25px;
+    height: 100px;
+    background: red;
+    border: 1px solid #000;
+    position: relative;
+    top: 7px;
+    left: 15px;
+}
+
+.io_module_0 {
+    width: 25px;
+    height: 100px;
+    background: purple;
+    border: 1px solid #000;
+    position: relative;
+    top: 7px;
+    left: 15px;
+}
+.io_module_1 {
+    width: 25px;
+    height: 100px;
+    background: purple;
+    border: 1px solid #000;
+    position: relative;
+    top: 7px;
+    left: 15px;
+}
+
+.io_module_2 {
+    width: 25px;
+    height: 100px;
+    background: purple;
+    border: 1px solid #000;
+    position: relative;
+    top: 7px;
+    left: 15px;
+}
+
+.io_module_3 {
+    width: 25px;
+    height: 100px;
+    background: purple;
+    border: 1px solid #000;
+    position: relative;
+    top: 7px;
+    left: 15px;
+}

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-pod-env
+data:
+  DB_CONTAINER_NAME: localhost
+  WEB_PORT: "8081"
