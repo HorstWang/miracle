@@ -11,3 +11,6 @@ sudo cp ./disable-apt-ssl /etc/apt/apt.conf.d/
 sudo apt-get update
 sudo apt-get install -y kubelet=$KUBE_VER kubeadm=$KUBE_VER kubectl=$KUBE_VER --allow-change-held-packages
 sudo apt-mark hold kubelet kubeadm kubectl
+
+echo 'Disable swap to avoid issue "Swap not supported"'
+sudo swapoff -a
