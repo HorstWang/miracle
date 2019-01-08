@@ -1,0 +1,21 @@
+#/bin/bash
+
+docker_service_d="/etc/systemd/system/docker.service.d"
+corp=$1
+proxy_file="$corp"-http-proxy.conf
+
+if [ \( "$corp" == '' \) -o \( ! -e "$proxy_file" \) ]
+then
+    echo "Must specify a valid corporation!"
+fi
+
+if [ ! -e "$docker_service_d" ]
+then
+    sudo mkdir $docker_service_d
+fi
+
+sudo cp ./"$proxy_file" $docker_service_d
+sudo systemctl daemon-reload
+sudo systemctl show --property Environment docker
+sudo systemctl restart docker
+sudo systemctl status docker

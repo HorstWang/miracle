@@ -1,0 +1,8 @@
+This folder is for configure proxy to docker daemon.
+It's helpful when your docker daemon failed to pull images when because of proxy mis-configuration issue.
+
+How to invoke:
+./configure-docker-proxy $CORP_NAME
+
+Script will pick http proxy file $CORP_NAME_http_proxy.conf to setup proxy for docker daemon ...
+If you moved to a new company, create a new .conf file with file name as $CORP_NAME_http_proxy.conf ...
