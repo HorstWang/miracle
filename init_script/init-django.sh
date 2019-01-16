@@ -1,5 +1,12 @@
 #/bin/bash
 
+pip_proxy_param=
+
+if [[ ! "$http_proxy" == "" ]]
+then
+    pip_proxy_param=--proxy=$http_proxy
+fi
+
 sudo apt-get update -y
 sudo apt-get install zlib1g-dev -y
 sudo apt-get install libssl-dev -y
@@ -16,14 +23,14 @@ cd ./Python-3.6.2
 make
 sudo make install
 cd /opt/Python-3.6.2/bin/
-sudo ./pip3.6 install virtualenv
+sudo ./pip3.6 install virtualenv $pip_proxy_param
 cd ~
 /opt/Python-3.6.2/bin/virtualenv venv_py_3.6.2 -p /opt/Python-3.6.2/bin/python3.6
 source ./venv_py_3.6.2/bin/activate
-pip install ipython
-pip install pandas
-pip install mysqlclient
-pip install django
+pip install ipython $pip_proxy_param
+pip install pandas $pip_proxy_param
+pip install mysqlclient $pip_proxy_param
+pip install django $pip_proxy_param
 #sudo apt-get install ubuntu-desktop -y
 #sudo apt-get install mysql-workbench -y
 #sudo shutdown -r now
