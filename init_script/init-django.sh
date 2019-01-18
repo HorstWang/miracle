@@ -31,6 +31,7 @@ pip install ipython $pip_proxy_param
 pip install pandas $pip_proxy_param
 pip install mysqlclient $pip_proxy_param
 pip install django $pip_proxy_param
+pip install xlwt $pip_proxy_param
 #sudo apt-get install ubuntu-desktop -y
 #sudo apt-get install mysql-workbench -y
 #sudo shutdown -r now
